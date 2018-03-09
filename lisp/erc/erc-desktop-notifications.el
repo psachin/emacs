@@ -52,6 +52,12 @@
   :version "25.1"
   :type '(choice (const :tag "Session bus" :session) string))
 
+(defcustom erc-notifications-show-channel nil
+  "Show channel name in notification.
+When non-nil displays channel name along with nick in notification."
+  :group 'erc-notifications
+  :type 'boolean)
+
 (defvar dbus-debug) ; used in the macroexpansion of dbus-ignore-errors
 
 (defun erc-notifications-notify (nick msg &optional privp)
@@ -59,6 +65,8 @@
 This will replace the last notification sent with this function."
   ;; TODO: can we do this without PRIVP? (by "fixing" ERC's not
   ;; setting the current buffer to the existing query buffer)
+  (if erc-notifications-show-channel
+      (setq nick (format "%s (%s)" nick (buffer-name))))
   (dbus-ignore-errors
     (setq erc-notifications-last-notification
           (let* ((channel (if privp (erc-get-buffer nick) (current-buffer)))
